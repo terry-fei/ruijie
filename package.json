@@ -17,6 +17,7 @@
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "mongoose": "^4.4.3",
+    "parameter": "^2.0.0",
     "xlsx": "^0.8.0"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import XLSX from 'xlsx';
 import mongoose from 'mongoose';
+import validate from 'parameter';
 
 import Crypto from '../lib/crypto';
 import config from '../config';
@@ -16,12 +17,75 @@ const NetCardSchema = new Schema({
   value: Number,
   batch: String,
   expireAt: Date,
-  orderID: String,
+  orderID: {
+    type: String,
+    default: '',
+  },
   isUsed: {
     type: Boolean,
     default: false,
   },
 });
+
+NetCardSchema.statics.findAndMark = async function ({ orderID, value, count }) {
+  let netcards;
+  netcards = await this.find({ orderID }).exec();
+  if (netcards.length) return netcards;
+
+  netcards = Array.from({ length: count }, async () => {
+    const netcard = await this.findOneAndUpdate({
+      value,
+      orderID: '',
+    }, { orderID }, { new: true }).sort({ ka: 1 }).exec();
+    return netcard;
+  });
+
+  return await Promise.all(netcards);
+};
+
+const netcardRule = {
+  ka: 'string',
+  mi: 'string',
+  value: [20, 30, 50],
+  batch: 'string',
+  expireAt: 'date',
+};
+
+NetCardSchema.statics.parseNetCardFile = function (filePath, fileName) {
+  const workBook = XLSX.readFile(filePath);
+
+  const targetSheet = workBook.Sheets[workBook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(targetSheet);
+
+  const batch = filePath.split('.')[0];
+  const statistics = {
+    batch,
+    20: 0,
+    30: 0,
+    50: 0,
+  };
+
+  const netCardArr = [];
+  for (const row of rows) {
+    const netcard = {
+      batch,
+      ka: row['卡号'],
+      mi: row['密码'],
+      value: parseInt(row['面额(元)'], 10),
+      expireAt: row['卡截止日期'],
+    };
+
+    const validateErr = validate(netcardRule, netcard);
+    if (validateErr) throw validateErr;
+
+    statistics[netcard.value] += 1;
+
+    netcard.mi = crypto.encrypt(netcard.ka, netcard.mi);
+    netCardArr.push(netcard);
+  }
+
+  return { statistics, netCardArr };
+};
 
 NetCardSchema.path('ka').index({ unique: true });
 
