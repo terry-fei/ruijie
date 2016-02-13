@@ -1,12 +1,13 @@
 import XLSX from 'xlsx';
 import mongoose from 'mongoose';
-import validate from 'parameter';
+import Parameter from 'parameter';
 
-import Crypto from '../lib/crypto';
+import crypto from '../lib/crypto';
 import config from '../config';
 
 const { Schema } = mongoose;
-const crypto = Crypto(config.ekey);
+const cryptor = crypto(config.ekey);
+const parameter = new Parameter();
 
 const NetCardSchema = new Schema({
   ka: {
@@ -57,7 +58,7 @@ NetCardSchema.statics.parseNetCardFile = function (filePath, fileName) {
   const targetSheet = workBook.Sheets[workBook.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json(targetSheet);
 
-  const batch = filePath.split('.')[0];
+  const batch = fileName.split('.')[0];
   const statistics = {
     batch,
     20: 0,
@@ -75,12 +76,12 @@ NetCardSchema.statics.parseNetCardFile = function (filePath, fileName) {
       expireAt: row['卡截止日期'],
     };
 
-    const validateErr = validate(netcardRule, netcard);
+    const validateErr = parameter.validate(netcardRule, netcard);
     if (validateErr) throw validateErr;
 
     statistics[netcard.value] += 1;
 
-    netcard.mi = crypto.encrypt(netcard.ka, netcard.mi);
+    netcard.mi = cryptor.encrypt(netcard.ka, netcard.mi);
     netCardArr.push(netcard);
   }
 

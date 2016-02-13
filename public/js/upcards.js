@@ -72,14 +72,12 @@ uploader.on( 'uploadSuccess', function( file ) {
 });
 
 uploader.on( 'uploadAccept', function( file, response ) {
-  console.log(response);
   // 通过return false来告诉组件，此文件上传有错。
   if (response.errcode) {
     return false;
   }
   window.UPLOAD_NETCARDS = window.UPLOAD_NETCARDS || [];
   window.UPLOAD_NETCARDS.push(response);
-  console.log(window.UPLOAD_NETCARDS);
 });
 
 // 文件上传失败，现实上传出错。
@@ -122,13 +120,15 @@ $(function () {
     var confirmStr = "本次上传20元网票：" + statistics['20'] + "张\n"
       + "上传30元网票：" + statistics['30'] + "张\n"
       + "上传50元网票：" + statistics['50'] + "张\n"
-    var result = confirm(confirmStr);
+      + "请输入确认密钥"
+    var key = prompt(confirmStr);
 
-    if (result) {
+    if (key) {
       var postData = {
+        key: key,
         batches: batches
       };
-      $.post('/confirm', postData, function (data) {
+      $.post('/upcards/confirm', postData, function (data) {
         if (data.errcode === 0) {
           alert('上传成功');
           window.location.reload()
@@ -136,9 +136,6 @@ $(function () {
           alert(data.errmsg)
         }
       });
-    } else {
-      window.location.reload()
     }
-
   });
 });
