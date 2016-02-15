@@ -18,7 +18,7 @@ uploader = WebUploader.create({
   auto: true,
 
   // swf文件路径
-  swf: '/js/Uploader.swf',
+  swf: 'http://cdn.staticfile.org/webuploader/0.1.5/Uploader.swf',
 
   // 文件接收服务端。
   server: '/upcards',
