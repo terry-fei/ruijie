@@ -20,6 +20,8 @@
     "lru-cache": "^4.0.0",
     "mongoose": "^4.4.3",
     "parameter": "^2.0.0",
+    "wechat-api": "^1.24.0",
+    "wechat-oauth": "^1.1.1",
     "xlsx": "^0.8.0"
   },
   "devDependencies": {
