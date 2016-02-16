@@ -48,7 +48,6 @@ uploader.on( 'fileQueued', function( file ) {
   $list.append( $li );
 
   $img.attr( 'src', '/img/xls.png' );
-
 });
 
 // 文件上传过程中创建进度条实时显示。
@@ -76,6 +75,8 @@ uploader.on( 'uploadAccept', function( file, response ) {
   if (response.errcode) {
     return false;
   }
+
+  delete response._raw;
   window.UPLOAD_NETCARDS = window.UPLOAD_NETCARDS || [];
   window.UPLOAD_NETCARDS.push(response);
 });
@@ -109,13 +110,11 @@ $(function () {
 
     var batches = [];
     var uploadNetcards = window.UPLOAD_NETCARDS;
-    for (var i = 0; i < uploadNetcards.length; i++) {
-      batch = uploadNetcards[i];
-      batches.push(batch.batch);
-      statistics['20'] = statistics['20'] + batch.statistics['20'];
-      statistics['30'] = statistics['30'] + batch.statistics['30'];
-      statistics['50'] = statistics['50'] + batch.statistics['50'];
-    };
+    uploadNetcards.forEach(function (batch) {
+      statistics['20'] += batch['20'];
+      statistics['30'] += batch['30'];
+      statistics['50'] += batch['50'];
+    });
 
     var confirmStr = "本次上传20元网票：" + statistics['20'] + "张\n"
       + "上传30元网票：" + statistics['30'] + "张\n"
@@ -126,16 +125,19 @@ $(function () {
     if (key) {
       var postData = {
         key: key,
-        batches: batches
+        batches: uploadNetcards
       };
+
       $.post('/upcards/confirm', postData, function (data) {
-        if (data.errcode === 0) {
-          alert('上传成功');
-          window.location.reload()
+        if (data.errcode) {
+          alert(data.errmsg);
         } else {
-          alert(data.errmsg)
+          alert(JSON.stringify(data.result));
+          window.location.reload();
         }
       });
+    } else {
+      alert('请输入上传密钥');
     }
   });
 });

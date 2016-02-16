@@ -47,6 +47,9 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+#uploader {
+  padding-top: 50px;
+}
 #uploader .thumbnail {
     width: 110px;
     height: 110px;
