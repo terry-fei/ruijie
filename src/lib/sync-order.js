@@ -91,7 +91,7 @@ async function sync() {
     if (trade.num_iid === '3032588') value = 50;
     if (trade.num_iid === '3032892') value = 30;
     if (trade.num_iid === '3032912') value = 20;
-    if (trade.num_iid === '8410163') value = 1;
+    if (trade.num_iid === '8410163') value = 0.01;
 
     if (value === 0) return;
 
