@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import NetCardSchema from './netcard';
+import OrderSchema from './order';
 
 import config from '../config';
 
@@ -17,4 +18,5 @@ conn.on('error', (err) => {
 
 export default {
   NetCard: conn.model('NetCard', NetCardSchema),
+  Order: conn.model('Order', OrderSchema),
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import KDTApi from 'node-kdt';
 
 import config from '../config';
@@ -13,9 +14,7 @@ kdtApi.defaultOpts = {
   use_has_next: true,
 };
 
-// convenient methods
-kdtApi.markSign = (data) => {
-  const method = 'kdt.logistics.online.marksign';
+function wrapPromise(method, data) {
   return new Promise((resolve, reject) => {
     kdtApi.get(method, data, (err, result) => {
       if (err) return reject(err);
@@ -23,6 +22,21 @@ kdtApi.markSign = (data) => {
       resolve(result);
     });
   });
+}
+
+kdtApi.fetchOrders = (data) => {
+  const method = 'kdt.trades.sold.get';
+  return wrapPromise(method, data);
+};
+
+kdtApi.fetchOpenid = (data) => {
+  const method = 'kdt.users.weixin.follower.get';
+  return wrapPromise(method, data);
+};
+
+kdtApi.markSign = (data) => {
+  const method = 'kdt.logistics.online.marksign';
+  return wrapPromise(method, data).then(console.log).catch(console.error);
 };
 
 export default kdtApi;

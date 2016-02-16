@@ -20,12 +20,13 @@ wechatApi.preRequest = function preRequest(method, args) {
 wechatApi.oauthApi = new WechatOAuth(wechatAppid, wechatSecret);
 
 // convenient methods
-wechatApi.sendChargeCard = ({ openid, value, count, orderId, url }) => {
+wechatApi.sendChargeCard = ({ _id, openID, value, count, orderID }) => {
   const templateId = 'N6rDOwzxZSSkf4wCTlke7zARBzoJTEQFX2yua-ZSAwM';
+  const url = `http://wp.feit.me/charge/oauth?oid=${_id}&yzoid=${orderID}`;
   const topColor = '';
   const data = {
     first: {
-      value: `${value * count}元校园网充值卡`,
+      value: `\n${value * count}元校园网充值卡`,
       color: '#f44336',
     },
     accountType: {
@@ -33,8 +34,8 @@ wechatApi.sendChargeCard = ({ openid, value, count, orderId, url }) => {
       color: '#000000',
     },
     account: {
-      value: `${orderId}`,
-      color: '#9e9e9e',
+      value: `${orderID}`,
+      color: '#f44336',
     },
     amount: {
       value: `${value * count}`,
@@ -46,12 +47,12 @@ wechatApi.sendChargeCard = ({ openid, value, count, orderId, url }) => {
     },
     remark: {
       value: '\n请尽快点击使用！',
-      color: '#9e9e9e',
+      color: '#f44336',
     },
   };
 
   return new Promise((resolve, reject) => {
-    wechatApi.sendTemplate(openid, templateId, url, topColor, data, (err, result) => {
+    wechatApi.sendTemplate(openID, templateId, url, topColor, data, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
