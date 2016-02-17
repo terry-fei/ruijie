@@ -61,17 +61,17 @@ async function notify() {
 async function sync() {
   const opts = Object.assign({}, kdtApi.defaultOpts);
 
-  let latestOrder;
-  try {
-    latestOrder = await Order.find().sort('-createAt -_id').limit(1).exec();
-  } catch (e) {
-    e.name = '[SyncOrder] Get Latest Order Error';
-    console.error(e);
-    return;
-  }
-
-  const date = latestOrder[0] ? moment(latestOrder[0].createAt) : moment();
-  opts.start_created = date.format('YYYY-MM-DD HH:mm:ss');
+  // let latestOrder;
+  // try {
+  //   latestOrder = await Order.find().sort('-createAt -_id').limit(1).exec();
+  // } catch (e) {
+  //   e.name = '[SyncOrder] Get Latest Order Error';
+  //   console.error(e);
+  //   return;
+  // }
+  //
+  // const date = latestOrder[0] ? moment(latestOrder[0].createAt) : moment();
+  // opts.start_created = date.format('YYYY-MM-DD HH:mm:ss');
 
   let result;
   try {
@@ -104,7 +104,10 @@ async function sync() {
       return;
     }
 
-    if (order) return;
+    if (order) {
+      await kdtApi.applyVirtualCode({ code: order.orderID });
+      return;
+    }
 
     const createAt = moment(trade.created, 'YYYY-MM-DD HH:mm:ss');
 
@@ -122,6 +125,8 @@ async function sync() {
       e.name = '[SyncOrder] create new order fail';
       console.error(e);
     }
+
+    await kdtApi.applyVirtualCode({ code: order.orderID });
   });
 
   setTimeout(notify, 1000);

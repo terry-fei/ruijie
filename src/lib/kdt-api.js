@@ -34,9 +34,20 @@ kdtApi.fetchOpenid = (data) => {
   return wrapPromise(method, data);
 };
 
+kdtApi.fetchVirtualCode = (data) => {
+  const method = 'kdt.trade.virtualcode.get';
+  return wrapPromise(method, data);
+};
+
+kdtApi.applyVirtualCode = (data) => {
+  const method = 'kdt.trade.virtualcode.apply';
+  return wrapPromise(method, data);
+};
+
+
 kdtApi.markSign = (data) => {
   const method = 'kdt.logistics.online.marksign';
-  return wrapPromise(method, data).then(console.log).catch(console.error);
+  return wrapPromise(method, data);
 };
 
 export default kdtApi;
