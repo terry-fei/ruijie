@@ -28,7 +28,7 @@ const NetCardSchema = new Schema({
   },
 });
 
-NetCardSchema.statics.findAndMark = async function ({ orderID, value, count }) {
+NetCardSchema.statics.findAndMark = async function findAndMark({ orderID, value, count }) {
   let netcards;
   netcards = await this.find({ orderID }).exec();
   if (netcards.length) return netcards;
@@ -52,7 +52,7 @@ const netcardRule = {
   expireAt: 'date',
 };
 
-NetCardSchema.statics.parseNetCardFile = function (filePath, fileName) {
+NetCardSchema.statics.parseNetCardFile = function parseNetCardFile(filePath, fileName) {
   const workBook = XLSX.readFile(filePath);
 
   const targetSheet = workBook.Sheets[workBook.SheetNames[0]];

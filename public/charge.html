@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no, minimal-ui">
+  <meta name="format-detection" content="telephone=no">
+  <title>校园网在线充值</title>
+  <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/0.3.0/weui.min.css">
+  <style>
+  body {
+    background-color: #FBF9FE;
+    -webkit-tap-highlight-color: transparent;
+  }
+  </style>
+</head>
+<body>
+  <div class="weui_cells_title">校园网账号</div>
+  <div class="weui_cells weui_cells_form">
+    <div class="weui_cell">
+      <div class="weui_cell_hd">
+        <label class="weui_label">学号</label>
+      </div>
+      <div class="weui_cell_bd weui_cell_primary">
+        <input id="stuid" class="weui_input" type="text" placeholder="请输入学号">
+      </div>
+    </div>
+    <div class="weui_cell">
+      <div class="weui_cell_hd">
+        <label class="weui_label">密码</label>
+      </div>
+      <div class="weui_cell_bd weui_cell_primary">
+        <input id="pswd" class="weui_input" type="password" placeholder="校园网登录密码">
+      </div>
+    </div>
+  </div>
+  <div class="weui_btn_area">
+    <a class="weui_btn weui_btn_primary" id="chargeBtn" href="javascript:">充值</a>
+  </div>
+
+  <script src="//cdn.bootcss.com/zepto/1.1.6/zepto.min.js"></script>
+  <script type="text/javascript" src="/js/weui.min.js"></script>
+  <script type="text/javascript" src="/js/charge.js"></script>
+</body>
+</html>
