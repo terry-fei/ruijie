@@ -10,6 +10,7 @@ import Parameter from 'parameter';
 import config from './config';
 import Models from './models';
 import * as ruijieHelper from './lib/ruijie-helper';
+import wechatApi from './lib/wechat-api';
 
 const { NetCard, Order } = Models;
 const parameter = new Parameter();
@@ -165,20 +166,44 @@ app.post('/charge', async (req, res) => {
     netcards = await NetCard.findAndMark(order);
   } catch (e) {
     e.name = '[SelfCharge] Get NetCards Error';
+    console.error(e);
     lruCache.set(yzoid, false);
     return res.json({ errcode: 2, errmsg: '数据库异常，请重试' });
   }
 
-  const chargeResult = await Promise.all(netcards.map(async (netcard) => {
+  let chargeResults = await Promise.all(netcards.map(async (netcard) => {
     if (netcard.isUsed) return netcard;
 
-    // TODO charge
-    return { value: netcard.value };
+    const { cardNo, cardSecret } = netcard;
+    const { cookie, code } = loginResult;
+
+    let chargeResult;
+    try {
+      chargeResult = ruijieHelper.charge({ cardNo, cardSecret, cookie, code });
+    } catch (e) {
+      e.name = '[SelfCharge] Charge Card Error';
+      console.error(e);
+      return netcard;
+    }
+
+    if (chargeResult.errcode !== 0) {
+      await wechatApi.sendToAdmin('充值卡错误', `${chargeResult.errmsg}\n${yzoid}`);
+      return netcard;
+    }
+
+    const chargedCard = await NetCard.findOneAndUpdate({ ka: cardNo }, {
+      isUsed: true,
+      orderID: yzoid,
+    }, { new: true }).exec();
+
+    return chargedCard;
   }));
 
   // clear lock
   lruCache.set(yzoid, false);
-  res.json({ errcode: 0, chargeResult });
+
+  chargeResults = chargeResults.map(item => ({ isUsed: item.isUsed, value: item.value }));
+  res.json({ errcode: 0, chargeResults });
 });
 // end orders
 

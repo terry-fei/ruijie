@@ -1,5 +1,6 @@
 import WechatApi from 'wechat-api';
 import WechatOAuth from 'wechat-oauth';
+import moment from 'moment';
 
 import config from '../config';
 
@@ -22,7 +23,7 @@ wechatApi.oauthApi = new WechatOAuth(wechatAppid, wechatSecret);
 // convenient methods
 wechatApi.sendChargeCard = ({ _id, openID, value, count, orderID }) => {
   const templateId = 'N6rDOwzxZSSkf4wCTlke7zARBzoJTEQFX2yua-ZSAwM';
-  const url = `http://wp.feit.me/charge/oauth?oid=${_id}&yzoid=${orderID}`;
+  const url = `http://wp.feit.me/charge.html?oid=${_id}&yzoid=${orderID}&openid=${openID}`;
   const topColor = '';
   const data = {
     first: {
@@ -46,13 +47,48 @@ wechatApi.sendChargeCard = ({ _id, openID, value, count, orderID }) => {
       color: '#f44336',
     },
     remark: {
-      value: '\n请尽快点击使用！',
+      value: '\n此卡仅限购买者微信使用\n可给任意校园网账户充值\n请尽快点击使用！',
       color: '#f44336',
     },
   };
 
   return new Promise((resolve, reject) => {
     wechatApi.sendTemplate(openID, templateId, url, topColor, data, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+wechatApi.sendToAdmin = (type, content) => {
+  const templateId = '9v8rmU1Zga3JM_eEEpCRRcah4y4ZMYAVMmkpRkjoJ34';
+  const url = '';
+  const topColor = '';
+  const data = {
+    first: {
+      value: '东农校园网充值系统通知',
+      color: '#000000',
+    },
+    time: {
+      value: moment().format('YYYY-MM-DD HH:mm'),
+      color: '#000000',
+    },
+    ip_list: {
+      value: '东农校园网充值服务器',
+      color: '#000000',
+    },
+    sec_type: {
+      value: type,
+      color: '#000000',
+    },
+    remark: {
+      value: content,
+      color: '#f44336',
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    wechatApi.sendTemplate(adminOpenid, templateId, url, topColor, data, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });

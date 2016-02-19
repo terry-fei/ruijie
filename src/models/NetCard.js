@@ -38,6 +38,10 @@ NetCardSchema.statics.findAndMark = async function findAndMark({ orderID, value,
       value,
       orderID: '',
     }, { orderID }, { new: true }).sort({ ka: 1 }).exec();
+
+    const secret = crypto.decrypt(netcard.mi);
+    netcard.cardNo = netcard.ka;
+    netcard.cardSecret = secret.message;
     return netcard;
   });
 
