@@ -1,11 +1,13 @@
 .webuploader-container {
 	position: relative;
 }
+
 .webuploader-element-invisible {
 	position: absolute !important;
 	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-    clip: rect(1px,1px,1px,1px);
+  clip: rect(1px,1px,1px,1px);
 }
+
 .webuploader-pick {
 	position: relative;
 	display: inline-block;
@@ -17,6 +19,7 @@
 	border-radius: 3px;
 	overflow: hidden;
 }
+
 .webuploader-pick-hover {
 	background: #00a2d4;
 }
@@ -36,8 +39,9 @@
     border-style: solid;
     border-width: 1px 0;
 }
+
 .upload-tip:after {
-    content:"上传网票XLS文件，一次请上传一个文件并确认，xls文件的文件名很重要，请直接使用锐捷系统生成的文件名，不要改动！";
+    content:"上传XLS文件";
     position: absolute;
     top: 15px;
     left: 15px;
@@ -47,26 +51,32 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
 #uploader {
   padding-top: 50px;
 }
+
 #uploader .thumbnail {
     width: 110px;
     height: 110px;
 }
+
 #uploader .thumbnail img {
     width: 100%;
 }
+
 .uploader-list {
     width: 100%;
     overflow: hidden;
 }
+
 .file-item {
     float: left;
     position: relative;
     margin: 0 20px 20px 0;
     padding: 4px;
 }
+
 .file-item .error {
     position: absolute;
     top: 4px;
@@ -79,6 +89,7 @@
     font-size: 14px;
     line-height: 23px;
 }
+
 .file-item .info {
     position: absolute;
     left: 4px;
@@ -95,6 +106,7 @@
     font-size: 12px;
     z-index: 10;
 }
+
 .upload-state-done:after {
     content:"\f00c";
     font-family: FontAwesome;
@@ -110,6 +122,7 @@
     color: #4cae4c;
     z-index: 99;
 }
+
 .file-item .progress {
     position: absolute;
     right: 4px;
@@ -123,6 +136,7 @@
     border-radius: 0;
     background: transparent;
 }
+
 .file-item .progress span {
     display: block;
     overflow: hidden;
@@ -141,6 +155,7 @@
     animation: progressmove 2s linear infinite;
     -webkit-transform: translateZ(0);
 }
+
 @-webkit-keyframes progressmove {
     0% {
         background-position: 0 0;

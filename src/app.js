@@ -165,6 +165,7 @@ app.post('/charge', async (req, res) => {
     netcards = await NetCard.findAndMark(order);
   } catch (e) {
     e.name = '[SelfCharge] Get NetCards Error';
+    lruCache.set(yzoid, false);
     return res.json({ errcode: 2, errmsg: '数据库异常，请重试' });
   }
 

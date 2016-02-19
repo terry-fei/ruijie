@@ -24,6 +24,7 @@
     "node-kdt": "^0.3.1",
     "parameter": "^2.0.0",
     "request-promise": "^2.0.0",
+    "urllib": "^2.7.1",
     "wechat-api": "^1.24.0",
     "wechat-oauth": "^1.1.1",
     "xlsx": "^0.8.0"

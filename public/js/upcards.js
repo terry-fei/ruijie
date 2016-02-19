@@ -1,19 +1,15 @@
 /* eslint-disable */
-var $ = jQuery,
-  $list = $('#fileList'),
-// 优化retina, 在retina下这个值是2
-  ratio = window.devicePixelRatio || 1,
+var $ = jQuery;
+var $list = $('#fileList');
+// 优化retina; 在retina下这个值是2
+var ratio = window.devicePixelRatio || 1;
 
 // 缩略图大小
-  thumbnailWidth = 100 * ratio,
-  thumbnailHeight = 100 * ratio,
-
-// Web Uploader实例
-  uploader;
+var thumbnailWidth = 100 * ratio;
+var thumbnailHeight = 100 * ratio;
 
 // 初始化Web Uploader
-uploader = WebUploader.create({
-
+var uploader = WebUploader.create({
   // 自动上传。
   auto: true,
 
@@ -36,7 +32,7 @@ uploader = WebUploader.create({
 });
 
 // 当有文件添加进来的时候
-uploader.on( 'fileQueued', function( file ) {
+uploader.on('fileQueued', function(file) {
   var $li = $(
       '<div id="' + file.id + '" class="file-item thumbnail">' +
       '<img>' +
@@ -51,54 +47,51 @@ uploader.on( 'fileQueued', function( file ) {
 });
 
 // 文件上传过程中创建进度条实时显示。
-uploader.on( 'uploadProgress', function( file, percentage ) {
-  var $li = $( '#'+file.id ),
-    $percent = $li.find('.progress span');
+uploader.on('uploadProgress', function(file, percentage) {
+  var $li = $('#' + file.id);
+  var $percent = $li.find('.progress span');
 
   // 避免重复创建
-  if ( !$percent.length ) {
+  if (!$percent.length) {
     $percent = $('<p class="progress"><span></span></p>')
       .appendTo( $li )
       .find('span');
   }
 
-  $percent.css( 'width', percentage * 100 + '%' );
+  $percent.css('width', percentage * 100 + '%');
 });
 
 // 文件上传成功，给item添加成功class, 用样式标记上传成功。
-uploader.on( 'uploadSuccess', function( file ) {
-  $( '#'+file.id ).addClass('upload-state-done');
+uploader.on('uploadSuccess', function(file) {
+  $( '#' + file.id ).addClass('upload-state-done');
 });
 
-uploader.on( 'uploadAccept', function( file, response ) {
+uploader.on('uploadAccept', function(file, response) {
   // 通过return false来告诉组件，此文件上传有错。
   if (response.errcode) {
     return false;
   }
 
-  delete response._raw;
-  window.UPLOAD_NETCARDS = window.UPLOAD_NETCARDS || [];
-  window.UPLOAD_NETCARDS.push(response);
+  console.log(response);
 });
 
 // 文件上传失败，现实上传出错。
-uploader.on( 'uploadError', function( file ) {
-  var $li = $( '#'+file.id ),
-    $error = $li.find('div.error');
+uploader.on('uploadError', function(file) {
+  var $li = $( '#' + file.id );
+  var $error = $li.find('div.error');
 
   // 避免重复创建
-  if ( !$error.length ) {
-    $error = $('<div class="error"></div>').appendTo( $li );
+  if (!$error.length) {
+    $error = $('<div class="error"></div>').appendTo($li);
   }
 
   $error.text('上传失败');
 });
 
 // 完成上传完了，成功或者失败，先删除进度条。
-uploader.on( 'uploadComplete', function( file ) {
-  $( '#'+file.id ).find('.progress').remove();
+uploader.on('uploadComplete', function(file) {
+  $( '#' + file.id ).find('.progress').remove();
 });
-
 
 $(function () {
   $('#confirm').on('click', function () {
