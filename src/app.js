@@ -179,7 +179,7 @@ app.post('/charge', async (req, res) => {
 
     let chargeResult;
     try {
-      chargeResult = ruijieHelper.charge({ cardNo, cardSecret, cookie, code });
+      chargeResult = await ruijieHelper.charge({ cardNo, cardSecret, cookie, code });
     } catch (e) {
       e.name = '[SelfCharge] Charge Card Error';
       console.error(e);
