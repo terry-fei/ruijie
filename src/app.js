@@ -220,6 +220,7 @@ app.post('/charge', async (req, res) => {
       isUsed: true,
       chargeFor: stuid,
     }).exec();
+    wechatApi.sendChargeSuccess(openid, stuid, successValue);
   }
 
   res.json({ errcode: 0, hasFailed, failedValue, successValue });

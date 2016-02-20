@@ -60,6 +60,40 @@ wechatApi.sendChargeCard = ({ _id, openID, value, count, orderID }) => {
   });
 };
 
+wechatApi.sendChargeSuccess = (openID, stuid, value) => {
+  const templateId = 'N6rDOwzxZSSkf4wCTlke7zARBzoJTEQFX2yua-ZSAwM';
+  const url = 'http://sss.neau.edu.cn';
+  const topColor = '';
+  const data = {
+    first: {
+      value: `\n${value}元校园网充值卡`,
+      color: '#f44336',
+    },
+    accountType: {
+      value: '帐号',
+      color: '#000000',
+    },
+    account: {
+      value: `${stuid}`,
+      color: '#f44336',
+    },
+    amount: {
+      value: `${value}`,
+      color: '#f44336',
+    },
+    result: {
+      value: '已充值',
+      color: '#f44336',
+    },
+    remark: {
+      value: `\n该卡已成功为账户 ${stuid} 充值 ${value} 元\n充值成功后可能需要更新一下套餐才能上网\n\n点我去更新`,
+      color: '#f44336',
+    },
+  };
+
+  wechatApi.sendTemplate(openID, templateId, url, topColor, data, () => (null));
+};
+
 wechatApi.sendToAdmin = (type, content) => {
   const templateId = '9v8rmU1Zga3JM_eEEpCRRcah4y4ZMYAVMmkpRkjoJ34';
   const url = '';
