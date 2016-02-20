@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import Parameter from 'parameter';
 
 import crypto from '../lib/crypto';
-import config from '../config';
+import config from '../../config';
 
 const { Schema } = mongoose;
 const cryptor = crypto(config.ekey);

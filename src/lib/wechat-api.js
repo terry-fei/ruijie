@@ -2,7 +2,7 @@ import WechatApi from 'wechat-api';
 import WechatOAuth from 'wechat-oauth';
 import moment from 'moment';
 
-import config from '../config';
+import config from '../../config';
 
 const { wechatAppid, wechatSecret, adminOpenid } = config;
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import KDTApi from 'node-kdt';
 
-import config from '../config';
+import config from '../../config';
 const { kdtAppid, kdtSecret } = config;
 
 const kdtApi = new KDTApi(kdtAppid, kdtSecret);

@@ -7,7 +7,7 @@ import LruCache from 'lru-cache';
 import { STATUS_CODES } from 'http';
 import Parameter from 'parameter';
 
-import config from './config';
+import config from '../config';
 import Models from './models';
 import * as ruijieHelper from './lib/ruijie-helper';
 import wechatApi from './lib/wechat-api';
@@ -19,7 +19,7 @@ const lruCache = new LruCache({
   maxAge: 1000 * 60 * 1,
 });
 
-const app = express();
+export const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -208,7 +208,3 @@ app.post('/charge', async (req, res) => {
 // end orders
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
-
-app.listen(config.port, () => {
-  console.log(`server start! listening ${config.port}`);
-});

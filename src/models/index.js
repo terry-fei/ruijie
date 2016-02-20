@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import NetCardSchema from './netcard';
 import OrderSchema from './order';
 
-import config from '../config';
+import config from '../../config';
 
 mongoose.connect(config.mongoUrl);
 
