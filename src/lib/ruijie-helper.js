@@ -98,7 +98,7 @@ export const charge = async ({ cardNo, cardSecret, cookie, code }) => {
 
   $inputs.each((i, e) => {
     const $e = $viewIdHtml(e);
-    const value = $e.val();
+    const value = $e.val() || '';
     if (value === '重置' || value === '查询') return;
     form[$e.attr('name')] = value;
   });
@@ -112,6 +112,8 @@ export const charge = async ({ cardNo, cardSecret, cookie, code }) => {
   delete form['ChargeCardForm:user_password'];
   delete form['ChargeCardForm:canOverdraft'];
   delete form['ChargeCardForm:getSelfChargeInfo'];
+  delete form.loginName;
+  delete form.userinfoHidden;
 
   const opts = {
     headers,
@@ -123,7 +125,7 @@ export const charge = async ({ cardNo, cardSecret, cookie, code }) => {
   const { data: resultHtml } = await urllib.request(chargeUrl, opts);
   const result = {};
 
-  if (!!~ resultHtml.indexOf('生成时间')) {
+  if (!!~ resultHtml.indexOf('充值成功')) {
     result.errcode = 0;
     result.errmsg = '充值成功';
   } else if (!!~ resultHtml.indexOf('充值卡已被充值')) {

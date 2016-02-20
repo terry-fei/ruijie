@@ -46,7 +46,7 @@ $(function () {
     $.post('/charge', query, function (data) {
       $.weui.hideLoading();
       if (data.errcode !== 0) {
-        let alertMsg = data.errmsg;
+        var alertMsg = data.errmsg;
         if (data.errcode === 4) {
           alertMsg += ('<center>充值账户</center><br><center>' + data.chargeFor + '</center>');
         }
