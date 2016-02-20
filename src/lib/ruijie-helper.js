@@ -9,22 +9,22 @@ export const login = async ({ stuid, pswd }) => {
   }
 
   const url = `http://nvc.feit.me/rj?stuid=${stuid}&pswd=${pswd}`;
-  const loginResult = await urllib.request(url, { dataType: 'json' });
+  const { data: loginResult } = await urllib.request(url, { dataType: 'json' });
   return loginResult;
 };
 
 function _makeHeader(cookie) {
   return {
     Host: '202.118.166.244:8080',
-    Referer: 'http://202.118.166.244:8080/selfservice/module/webcontent/web/index_self.jsf?',
+    Referer: `${baseUrl}/module/webcontent/web/index_self.jsf?`,
     Cookie: cookie,
   };
 }
 
 const cardStatusUrl = `${baseUrl}/module/chargecardself/web/chargecardself_list.jsf`;
-export const getCardStatus = async ({ cardNo, cardSecret, cookie, vcode }) => {
-  if (!cardNo || !cardSecret || !cookie || !vcode) {
-    throw new Error('cardNo, cardSecret, cookie and vcode are required');
+export const getCardStatus = async ({ cardNo, cardSecret, cookie, code }) => {
+  if (!cardNo || !cardSecret || !cookie || !code) {
+    throw new Error('cardNo, cardSecret, cookie and code are required');
   }
 
   const headers = _makeHeader(cookie);
@@ -46,7 +46,7 @@ export const getCardStatus = async ({ cardNo, cardSecret, cookie, vcode }) => {
     form[$e.attr('name')] = $e.val();
   });
 
-  form['ChargeCardListForm:submitcode'] = vcode;
+  form['ChargeCardListForm:submitcode'] = code;
   form['ChargeCardListForm:cardNo'] = cardNo;
   form['ChargeCardListForm:password'] = cardSecret;
 
@@ -78,9 +78,9 @@ export const getCardStatus = async ({ cardNo, cardSecret, cookie, vcode }) => {
 };
 
 const chargeUrl = `${baseUrl}/module/chargecardself/web/chargecardself_charge.jsf`;
-export const charge = async ({ cardNo, cardSecret, cookie, vcode }) => {
-  if (!cardNo || !cardSecret || !cookie || !vcode) {
-    throw new Error('cardNo, cardSecret, cookie and vcode are required');
+export const charge = async ({ cardNo, cardSecret, cookie, code }) => {
+  if (!cardNo || !cardSecret || !cookie || !code) {
+    throw new Error('cardNo, cardSecret, cookie and code are required');
   }
 
   const headers = _makeHeader(cookie);
@@ -105,7 +105,7 @@ export const charge = async ({ cardNo, cardSecret, cookie, vcode }) => {
 
   form['ChargeCardForm:cardNo'] = cardNo;
   form['ChargeCardForm:password'] = cardSecret;
-  form['ChargeCardForm:verify'] = vcode;
+  form['ChargeCardForm:verify'] = code;
 
   form.test = 'on';
   delete form['ChargeCardForm:userId'];
@@ -132,9 +132,10 @@ export const charge = async ({ cardNo, cardSecret, cookie, vcode }) => {
   } else if (!!~ resultHtml.indexOf('充值卡不存在或已作废')) {
     result.errcode = 2;
     result.errmsg = '充值卡不存在或已作废';
-  } else if (!!~ resultHtml.indexOf('充值卡密码错误')) {
-    result.errcode = 3;
-    result.errmsg = '充值卡密码错误';
+  // 得不到这个充值卡密码错误这个状态
+  // } else if (!!~ resultHtml.indexOf('充值卡密码错误')) {
+  //   result.errcode = 3;
+  //   result.errmsg = '充值卡密码错误';
   } else {
     result.errcode = 4;
     result.errmsg = '未知状态';

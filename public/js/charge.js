@@ -59,16 +59,10 @@ $(function () {
         return;
       }
 
-      var totalValue = 0;
-      var failedValue = 0;
-      for (var i = 0; i < data.chargeResults.length; i++) {
-        var card = data.chargeResults[i];
-        card.isUsed ? totalValue += card.value : failedValue += card.value;
-      }
-      if (failedValue !== 0) {
-        $.weui.alert('充值失败，请重试，如多次尝试仍失败，请申诉', function () {});
+      if (data.hasFailed) {
+        $.weui.alert('充值异常，请重试，如多次尝试仍失败，请申诉', function () {});
       } else {
-        $.weui.alert('<center>充值成功</center><br><center>金额：' + totalValue + '元</center>', closeWindow);
+        $.weui.alert('<center>充值成功</center><br><center>金额：' + data.successValue + '元</center>', closeWindow);
       }
     });
   });

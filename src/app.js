@@ -149,7 +149,7 @@ app.post('/charge', async (req, res) => {
     return res.json({ errcode: 6, errmsg: '网络出错，请重试' });
   }
 
-  if (loginResult.errcode) {
+  if (loginResult.errcode !== 0) {
     return res.json({ errcode: 7, errmsg: '请检查输入的校园网账户和密码' });
   }
 
@@ -171,7 +171,7 @@ app.post('/charge', async (req, res) => {
     return res.json({ errcode: 2, errmsg: '数据库异常，请重试' });
   }
 
-  let chargeResults = await Promise.all(netcards.map(async (netcard) => {
+  const chargeResults = await Promise.all(netcards.map(async (netcard) => {
     if (netcard.isUsed) return netcard;
 
     const { cardNo, cardSecret } = netcard;
@@ -202,8 +202,27 @@ app.post('/charge', async (req, res) => {
   // clear lock
   lruCache.set(yzoid, false);
 
-  chargeResults = chargeResults.map(item => ({ isUsed: item.isUsed, value: item.value }));
-  res.json({ errcode: 0, chargeResults });
+  let hasFailed = false;
+  let failedValue = 0;
+  let successValue = 0;
+  chargeResults.map(item => {
+    if (!item.isUsed) {
+      hasFailed = true;
+      failedValue += item.value;
+      return;
+    }
+
+    successValue += item.value;
+  });
+
+  if (!hasFailed) {
+    await Order.findOneAndUpdate({ orderID: yzoid }, {
+      isUsed: true,
+      chargeFor: stuid,
+    }).exec();
+  }
+
+  res.json({ errcode: 0, hasFailed, failedValue, successValue });
 });
 // end orders
 

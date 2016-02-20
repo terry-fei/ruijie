@@ -21,4 +21,4 @@ const OrderSchema = new Schema({
 
 OrderSchema.path('orderID').index({ unique: true });
 
-export default OrderSchema;
+export default mongoose.model('Order', OrderSchema);

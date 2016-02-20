@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import XLSX from 'xlsx';
 import mongoose from 'mongoose';
 import Parameter from 'parameter';
@@ -28,10 +29,19 @@ const NetCardSchema = new Schema({
   },
 });
 
+function decrypt(netcard) {
+  const { message } = cryptor.decrypt(netcard.mi);
+  netcard.cardNo = netcard.ka;
+  netcard.cardSecret = message;
+}
+
 NetCardSchema.statics.findAndMark = async function findAndMark({ orderID, value, count }) {
   let netcards;
   netcards = await this.find({ orderID }).exec();
-  if (netcards.length) return netcards;
+  if (netcards.length) {
+    netcards.forEach(decrypt);
+    return netcards;
+  }
 
   netcards = Array.from({ length: count }, async () => {
     const netcard = await this.findOneAndUpdate({
@@ -39,9 +49,7 @@ NetCardSchema.statics.findAndMark = async function findAndMark({ orderID, value,
       orderID: '',
     }, { orderID }, { new: true }).sort({ ka: 1 }).exec();
 
-    const secret = crypto.decrypt(netcard.mi);
-    netcard.cardNo = netcard.ka;
-    netcard.cardSecret = secret.message;
+    decrypt(netcard);
     return netcard;
   });
 
@@ -94,4 +102,4 @@ NetCardSchema.statics.parseNetCardFile = function parseNetCardFile(filePath, fil
 
 NetCardSchema.path('ka').index({ unique: true });
 
-export default NetCardSchema;
+export default mongoose.model('NetCard', NetCardSchema);
