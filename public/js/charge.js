@@ -16,6 +16,10 @@ function getQuerys() {
   return theRequest;
 }
 
+function closeWindow() {
+  WeixinJSBridge.invoke('closeWindow', {}, function(res){});
+}
+
 $(function () {
   var query = getQuerys();
   $('#chargeBtn').click(function () {
@@ -41,10 +45,10 @@ $(function () {
 
     $.post('/charge', query, function (data) {
       $.weui.hideLoading();
-      if (data.errcode) {
+      if (data.errcode !== 0) {
         let alertMsg = data.errmsg;
         if (data.errcode === 4) {
-          alertMsg += ('<center>充值账户</center><center>' + data.chargeFor + '</center>');
+          alertMsg += ('<center>充值账户</center><br><center>' + data.chargeFor + '</center>');
         }
 
         if (data.errcode === 7) {
@@ -55,7 +59,17 @@ $(function () {
         return;
       }
 
-      console.log(data);
+      var totalValue = 0;
+      var failedValue = 0;
+      for (var i = 0; i < data.chargeResults.length; i++) {
+        var card = data.chargeResults[i];
+        card.isUsed ? totalValue += card.value : failedValue += card.value;
+      }
+      if (failedValue !== 0) {
+        $.weui.alert('充值失败，请重试，如多次尝试仍失败，请申诉', function () {});
+      } else {
+        $.weui.alert('<center>充值成功</center><br><center>金额：' + totalValue + '元</center>', closeWindow);
+      }
     });
   });
 });
