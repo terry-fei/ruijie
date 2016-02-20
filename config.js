@@ -1,7 +1,10 @@
 const dotenv = require('dotenv');
-dotenv.config();
 
 const env = process.env;
+
+if (env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 module.exports = {
   mongoUrl: env.MONGO_URL,

@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import kdtApi from './kdt-api';
 import wechatApi from './wechat-api';
-import Models from '../Models';
+import Models from '../models';
 
 const { Order } = Models;
 

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "babel --plugins \"transform-runtime\" src --ignore tests --out-dir ./dist && node index.js",
+    "compile": "babel --plugins \"transform-runtime\" src --ignore tests --out-dir ./dist",
+    "start": "node index.js",
     "dev": "nodemon --exec babel-node src/app.js",
     "test": "_mocha --compilers js:babel-core/register --require babel-polyfill src/tests/**/*.js",
     "test-watch": "npm run test -- --watch"
