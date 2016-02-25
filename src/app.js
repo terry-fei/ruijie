@@ -186,6 +186,11 @@ app.post('/charge', async (req, res) => {
       return netcard;
     }
 
+    if (chargeResult.errcode === 1) {
+      const cardStatus = await ruijieHelper.getCardStatus({ cardNo, cardSecret, cookie, code });
+      if (cardStatus.stuid === stuid) chargeResult.errcode = 0;
+    }
+
     if (chargeResult.errcode !== 0) {
       await wechatApi.sendToAdmin('充值卡错误', `${chargeResult.errmsg}\n${yzoid}`);
       return netcard;
