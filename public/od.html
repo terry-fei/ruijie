@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no, minimal-ui">
+  <meta name="format-detection" content="telephone=no">
+  <title>订单状态查询</title>
+  <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/0.3.0/weui.min.css">
+  <style>
+  body {
+    background-color: #FBF9FE;
+    -webkit-tap-highlight-color: transparent;
+  }
+  </style>
+</head>
+<body>
+  <div class="weui_cells weui_cells_form">
+    <div class="weui_cell">
+      <div class="weui_cell_hd">
+        <label class="weui_label">订单号</label>
+      </div>
+      <div class="weui_cell_bd weui_cell_primary">
+        <input id="yzoid" class="weui_input" type="text" placeholder="请输入订单号">
+      </div>
+    </div>
+  </div>
+  <div class="weui_btn_area">
+    <a class="weui_btn weui_btn_primary" id="btn" href="javascript:">查询</a>
+  </div>
+
+  <div class="weui_cells_title" style="margin-top: 50px;">查询结果</div>
+  <div class="weui_cells">
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>面值：</p>
+        </div>
+        <div id="value" class="weui_cell_ft"></div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>数量：</p>
+        </div>
+        <div id="count" class="weui_cell_ft"></div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>充值账户：</p>
+        </div>
+        <div id="chargeFor" class="weui_cell_ft"></div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>订单时间：</p>
+        </div>
+        <div id="time" class="weui_cell_ft"></div>
+    </div>
+    <div class="weui_cells_title" style="margin-top: 50px;">充值卡信息：</div>
+    <pre style="padding: 0px 15px"><code id="usedCards"></code></pre>
+  </div>
+
+  <script src="//cdn.bootcss.com/zepto/1.1.6/zepto.min.js"></script>
+  <script type="text/javascript" src="/js/weui.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('#btn').click(function () {
+        var orderID = $('#yzoid').val();
+        $.weui.loading('正在查询...');
+        $.get('/od?yzoid=' + orderID, function (data) {
+          $.weui.hideLoading();
+
+          if (data.errmsg) {
+            $.weui.alert(data.errmsg, function () {});
+            return;
+          }
+
+          $('#value').text(data.value);
+          $('#count').text(data.count);
+          $('#chargeFor').text(data.chargeFor);
+          $('#time').text(data.time);
+          $('#usedCards').text(JSON.stringify(data.usedCards, null, 4));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

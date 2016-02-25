@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import ejs from 'ejs';
 import express from 'express';
+import moment from 'moment';
 import bodyParser from 'body-parser';
 import { IncomingForm } from 'formidable';
 import LruCache from 'lru-cache';
@@ -12,6 +13,7 @@ import config from '../config';
 import Models from './models';
 import * as ruijieHelper from './lib/ruijie-helper';
 import wechatApi from './lib/wechat-api';
+import crypto from './lib/crypto';
 
 const { NetCard, Order } = Models;
 const parameter = new Parameter();
@@ -283,12 +285,66 @@ app.get('/charge/my', (req, res) => {
     });
   });
 });
+
+app.get('/od', async (req, res) => {
+  const orderID = req.query.yzoid;
+
+  let order;
+  try {
+    order = await Order.findOne({ orderID }).exec();
+  } catch (e) {
+    console.error(e);
+    return res.json({ errcode: 1, errmsg: 'dberror' });
+  }
+
+  if (!order) {
+    return res.json({ errcode: 2, errmsg: 'order not found' });
+  }
+
+  let netcards;
+  try {
+    netcards = await NetCard.find({ orderID }).exec();
+  } catch (e) {
+    console.error(e);
+    return res.json({ errcode: 1, errmsg: 'dberror' });
+  }
+
+  let loginResult;
+  try {
+    loginResult = await ruijieHelper.login({ stuid: 'test2', pswd: '654123' });
+  } catch (e) {
+    console.error(e);
+    return res.json({ errcode: 6, errmsg: '网络出错，请重试' });
+  }
+
+  if (loginResult.errcode !== 0) {
+    return res.json({ errcode: 7, errmsg: '管理员帐号密码错误' });
+  }
+
+  const cardStatus = await Promise.all(netcards.map(async (card) => {
+    const query = Object.assign({}, loginResult);
+    query.cardNo = card.ka;
+    const secret = crypto.decrypt(card.mi);
+    query.cardSecret = secret.message;
+    const status = await ruijieHelper.getCardStatus(query);
+    return status;
+  }));
+
+  res.json({
+    yzoid: order.orderID,
+    value: order.value,
+    count: order.count,
+    chargeFor: order.chargeFor,
+    time: moment.utc(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
+    usedCards: cardStatus,
+  });
+});
 // end orders
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(config.port, () => {
-    console.log(`Server Start! listening ${config.port}`);
+    console.log(`[DEV] Server Start! listening ${config.port}`);
   });
 }
