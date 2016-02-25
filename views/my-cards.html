@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no, minimal-ui">
+  <meta name="format-detection" content="telephone=no">
+  <title>我购买的充值卡</title>
+  <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/0.3.0/weui.min.css">
+  <style>
+  body {
+    background-color: #FBF9FE;
+    -webkit-tap-highlight-color: transparent;
+  }
+  </style>
+</head>
+<body>
+  <div class="weui_cells_title"><%= errmsg || '未使用的充值卡'%></div>
+  <div class="weui_cells weui_cells_access">
+
+    <% unUsedCards.forEach(function (card) { %>
+      <a class="weui_cell" href="/charge.html?oid=<%= card.oid%>&yzoid=<%= card.yzoid%>&openid=<%= card.openid%>">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p><%= card.value + '元充值卡' %></p>
+          </div>
+          <div class="weui_cell_ft"></div>
+      </a>
+    <% })%>
+  </div>
+
+  <script src="//cdn.bootcss.com/zepto/1.1.6/zepto.min.js"></script>
+  <script type="text/javascript" src="/js/weui.min.js"></script>
+  <script type="text/javascript" src="/js/charge.js"></script>
+</body>
+</html>

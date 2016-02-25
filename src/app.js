@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import ejs from 'ejs';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { IncomingForm } from 'formidable';
@@ -23,6 +24,10 @@ export const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.set('views', path.join(__dirname, '..', 'views'));
+app.set('view engine', 'html');
+app.engine('html', ejs.renderFile);
 
 app.get('/', async (req, res) => {
   res.end(STATUS_CODES[401]);
@@ -230,6 +235,60 @@ app.post('/charge', async (req, res) => {
 
   res.json({ errcode: 0, hasFailed, failedValue, successValue });
 });
+
+app.get('/charge/my', (req, res) => {
+  const code = req.query.code;
+
+  if (!code) {
+    const oauthDispatherUrl = 'http://n.feit.me/wechat/oauth';
+    const thisUrl = `${req.protocol}://${req.hostname + req.path}`;
+    const state = JSON.stringify({ url: thisUrl });
+    const oauthUrl = wechatApi.oauthApi.getAuthorizeURL(oauthDispatherUrl, state);
+    res.redirect(oauthUrl);
+    return;
+  }
+
+  const data = {
+    errmsg: '',
+    unUsedCards: [],
+  };
+
+  wechatApi.oauthApi.getAccessToken(code, (err, result) => {
+    if (err) {
+      data.errmsg = '查询失败，请稍后再试';
+      return res.render('my-cards', data);
+    }
+
+    const { openid } = result.data;
+
+    Order.find({ openID: openid }).exists('chargeFor', false).exec((dberr, orders) => {
+      if (dberr) {
+        data.errmsg = '查询失败，请稍后再试';
+        return res.render('my-cards', data);
+      }
+
+      if (orders.length === 0) {
+        data.errmsg = '没找到未使用的充值卡';
+        return res.render('my-cards', data);
+      }
+
+      data.unUsedCards = orders.map(order => ({
+        openid,
+        yzoid: order.orderID,
+        value: order.value * order.count,
+        oid: order._id,
+      }));
+
+      res.render('my-cards', data);
+    });
+  });
+});
 // end orders
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(config.port, () => {
+    console.log(`Server Start! listening ${config.port}`);
+  });
+}
