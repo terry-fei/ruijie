@@ -18,7 +18,7 @@ wechatApi.preRequest = function preRequest(method, args) {
   method.apply(this, args);
 };
 
-wechatApi.oauthApi = new WechatOAuth(wechatAppid, wechatSecret);
+wechatApi.oauthApi = new WechatOAuth(wechatAppid, '5818c9e2dffd748b1c685113546bbb82');
 
 // convenient methods
 wechatApi.sendChargeCard = ({ _id, openID, value, count, orderID }) => {
