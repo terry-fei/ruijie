@@ -14,6 +14,7 @@ import Models from './models';
 import * as ruijieHelper from './lib/ruijie-helper';
 import wechatApi from './lib/wechat-api';
 import crypto from './lib/crypto';
+import log from './lib/log';
 
 const { NetCard, Order } = Models;
 const parameter = new Parameter();
@@ -40,7 +41,7 @@ app.post('/upcards', (req, res) => {
   const form = new IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
-      console.error(err);
+      log.error(err);
       return res.json({ errcode: 1, errmsg: 'upload file error' });
     }
 
@@ -51,7 +52,7 @@ app.post('/upcards', (req, res) => {
     try {
       result = NetCard.parseNetCardFile(filePath, fileName);
     } catch (e) {
-      console.error(e);
+      log.error(e);
       return res.json({ errcode: 2, errmsg: 'parse netcard file fail' });
     } finally {
       fs.unlink(filePath);
@@ -93,7 +94,7 @@ app.post('/upcards/confirm', async (req, res) => {
     try {
       createResult = await NetCard.create(lruCache.get(batchId));
     } catch (e) {
-      console.error(e);
+      log.error(e);
       return res.json({ errcode: 3, errmsg: `save netcards error ${batchId}` });
     }
 
@@ -132,7 +133,7 @@ app.post('/charge', async (req, res) => {
     order = await Order.findOne({ orderID: yzoid, _id: oid }).exec();
   } catch (e) {
     e.name = '[SelfCharge] Find Order Error';
-    console.error(e);
+    log.error(e);
     return res.json({ errcode: 2, errmsg: '数据库异常，请重试' });
   }
 
@@ -152,7 +153,7 @@ app.post('/charge', async (req, res) => {
     loginResult = await ruijieHelper.login({ stuid, pswd });
   } catch (e) {
     e.name = '[SelfCharge] Login Ruijie Error';
-    console.error(e);
+    log.error(e);
     return res.json({ errcode: 6, errmsg: '网络出错，请重试' });
   }
 
@@ -173,7 +174,7 @@ app.post('/charge', async (req, res) => {
     netcards = await NetCard.findAndMark(order);
   } catch (e) {
     e.name = '[SelfCharge] Get NetCards Error';
-    console.error(e);
+    log.error(e);
     lruCache.set(yzoid, false);
     return res.json({ errcode: 2, errmsg: '数据库异常，请重试' });
   }
@@ -189,7 +190,7 @@ app.post('/charge', async (req, res) => {
       chargeResult = await ruijieHelper.charge({ cardNo, cardSecret, cookie, code });
     } catch (e) {
       e.name = '[SelfCharge] Charge Card Error';
-      console.error(e);
+      log.error(e);
       return netcard;
     }
 
@@ -293,7 +294,7 @@ app.get('/od', async (req, res) => {
   try {
     order = await Order.findOne({ orderID }).exec();
   } catch (e) {
-    console.error(e);
+    log.error(e);
     return res.json({ errcode: 1, errmsg: 'dberror' });
   }
 
@@ -305,7 +306,7 @@ app.get('/od', async (req, res) => {
   try {
     netcards = await NetCard.find({ orderID }).exec();
   } catch (e) {
-    console.error(e);
+    log.error(e);
     return res.json({ errcode: 1, errmsg: 'dberror' });
   }
 
@@ -313,7 +314,7 @@ app.get('/od', async (req, res) => {
   try {
     loginResult = await ruijieHelper.login({ stuid: 'test2', pswd: '654123' });
   } catch (e) {
-    console.error(e);
+    log.error(e);
     return res.json({ errcode: 6, errmsg: '网络出错，请重试' });
   }
 
@@ -345,6 +346,6 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(config.port, () => {
-    console.log(`[DEV] Server Start! listening ${config.port}`);
+    log.info(`[DEV] Server Start! listening ${config.port}`);
   });
 }

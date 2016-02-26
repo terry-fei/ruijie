@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import moment from 'moment';
+import log from './log';
 
 import kdtApi from './kdt-api';
 import wechatApi from './wechat-api';
@@ -13,7 +14,7 @@ async function notify() {
     orders = await Order.find({ isNotified: false }).exec();
   } catch (e) {
     e.name = '[NotifyBuyer] Get Not Notified Oders Error';
-    console.error(e);
+    log.error(e);
     return;
   }
 
@@ -35,7 +36,7 @@ async function notify() {
       fetchOpenidResult = await kdtApi.fetchOpenid(opts);
     } catch (e) {
       e.name = '[NotifyBuyer] Get Buyer Openid Error';
-      console.error(e);
+      log.error(e);
       return;
     }
 
@@ -66,7 +67,7 @@ async function sync() {
   //   latestOrder = await Order.find().sort('-createAt -_id').limit(1).exec();
   // } catch (e) {
   //   e.name = '[SyncOrder] Get Latest Order Error';
-  //   console.error(e);
+  //   log.error(e);
   //   return;
   // }
   //
@@ -78,7 +79,7 @@ async function sync() {
     result = await kdtApi.fetchOrders(opts);
   } catch (e) {
     e.name = '[SyncOrder] Fetch Orders Error';
-    console.error(e);
+    log.error(e);
     return;
   }
 
@@ -99,7 +100,7 @@ async function sync() {
       order = await Order.findOne({ orderID: trade.tid }).exec();
     } catch (e) {
       e.name = '[SyncOrder] get order error';
-      console.error(e);
+      log.error(e);
       return;
     }
 
@@ -122,7 +123,7 @@ async function sync() {
       await Order.create(newOrder);
     } catch (e) {
       e.name = '[SyncOrder] create new order fail';
-      console.error(e);
+      log.error(e);
     }
 
     await kdtApi.applyVirtualCode({ code: order.orderID });

@@ -92,7 +92,7 @@ describe('Charge Ctrl Test', () => {
       };
 
       Order.create(newOrder, (err, order) => {
-        if (err) return console.error(err);
+        if (err) return log.error(err);
         oid = order._id;
         done();
       });
@@ -139,7 +139,7 @@ describe('Charge Ctrl Test', () => {
   //     };
   //
   //     Order.create(newOrder, (err, order) => {
-  //       if (err) return console.error(err);
+  //       if (err) return log.error(err);
   //       oid = order._id;
   //       done();
   //     });
