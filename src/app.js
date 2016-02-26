@@ -18,6 +18,7 @@ import log from './lib/log';
 
 const { NetCard, Order } = Models;
 const parameter = new Parameter();
+const cryptor = crypto(config.ekey);
 
 const lruCache = new LruCache({
   maxAge: 1000 * 60 * 1,
@@ -258,6 +259,7 @@ app.get('/charge/my', (req, res) => {
 
   wechatApi.oauthApi.getAccessToken(code, (err, result) => {
     if (err) {
+      log.error('[MyCards] get openid error', err);
       data.errmsg = '查询失败，请稍后再试';
       return res.render('my-cards', data);
     }
@@ -266,6 +268,7 @@ app.get('/charge/my', (req, res) => {
 
     Order.find({ openID: openid }).exists('chargeFor', false).exec((dberr, orders) => {
       if (dberr) {
+        log.error('[MyCards] get order error', dberr);
         data.errmsg = '查询失败，请稍后再试';
         return res.render('my-cards', data);
       }
@@ -302,12 +305,25 @@ app.get('/od', async (req, res) => {
     return res.json({ errcode: 2, errmsg: 'order not found' });
   }
 
+  const data = {
+    yzoid: order.orderID,
+    value: order.value,
+    count: order.count,
+    chargeFor: order.chargeFor,
+    time: moment.utc(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
+  };
+
   let netcards;
   try {
     netcards = await NetCard.find({ orderID }).exec();
   } catch (e) {
     log.error(e);
     return res.json({ errcode: 1, errmsg: 'dberror' });
+  }
+
+  if (netcards.length === 0) {
+    data.usedCards = { msg: '该订单没有绑定网卡' };
+    return res.json(data);
   }
 
   let loginResult;
@@ -322,23 +338,18 @@ app.get('/od', async (req, res) => {
     return res.json({ errcode: 7, errmsg: '管理员帐号密码错误' });
   }
 
-  const cardStatus = await Promise.all(netcards.map(async (card) => {
+  const allStatus = netcards.map(async (card) => {
     const query = Object.assign({}, loginResult);
     query.cardNo = card.ka;
-    const secret = crypto.decrypt(card.mi);
+    const secret = cryptor.decrypt(card.mi);
     query.cardSecret = secret.message;
     const status = await ruijieHelper.getCardStatus(query);
     return status;
-  }));
-
-  res.json({
-    yzoid: order.orderID,
-    value: order.value,
-    count: order.count,
-    chargeFor: order.chargeFor,
-    time: moment.utc(order.createAt).format('YYYY-MM-DD HH:mm:ss'),
-    usedCards: cardStatus,
   });
+
+  data.usedCards = await Promise.all(allStatus);
+
+  res.json(data);
 });
 // end orders
 
