@@ -43,9 +43,9 @@ const valueToNumiid = {
 const warningCout = 150;
 const delistingCount = 20;
 const checkSku = async (force) => {
-  const v50sku = await NetCard.count({ value: 50 }).exec();
-  const v30sku = await NetCard.count({ value: 30 }).exec();
-  const v20sku = await NetCard.count({ value: 20 }).exec();
+  const v50sku = await NetCard.count({ value: 50, isUsed: false }).exec();
+  const v30sku = await NetCard.count({ value: 30, isUsed: false }).exec();
+  const v20sku = await NetCard.count({ value: 20, isUsed: false }).exec();
 
   if (v50sku < warningCout || v30sku < warningCout || v20sku < warningCout || force) {
     await wechatApi.sendToAdmin('库存通知', `
@@ -72,6 +72,11 @@ const checkSku = async (force) => {
 
 app.get('/', async (req, res) => {
   res.end(STATUS_CODES[401]);
+});
+
+app.get('/sku/check', async (req, res) => {
+  await checkSku(true);
+  res.send('done');
 });
 
 // netcards
@@ -117,7 +122,7 @@ app.post('/upcards/confirm', async (req, res) => {
       return res.json({ errcode: 2, errmsg: `batch not found ${batchId}` });
     }
 
-    const checkBatch = await NetCard.findOne(batchId).exec();
+    const checkBatch = await NetCard.findOne({ batch: batchId }).exec();
     if (checkBatch) {
       return res.json({ errcode: 2, errmsg: `batch exists ${batchId}` });
     }
@@ -143,6 +148,7 @@ app.post('/upcards/confirm', async (req, res) => {
   }
 
   res.json({ errcode: 0, result });
+  await checkSku(true);
 });
 // end netcards
 
@@ -275,6 +281,7 @@ app.post('/charge', async (req, res) => {
   }
 
   res.json({ errcode: 0, hasFailed, failedValue, successValue });
+  await checkSku();
 });
 
 app.get('/charge/my', (req, res) => {
