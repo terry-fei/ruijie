@@ -50,4 +50,9 @@ kdtApi.markSign = (data) => {
   return wrapPromise(method, data);
 };
 
+kdtApi.delisting = (data) => {
+  const method = 'kdt.item.update.delisting';
+  return wrapPromise(method, data);
+};
+
 export default kdtApi;

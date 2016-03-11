@@ -13,6 +13,7 @@ import config from '../config';
 import Models from './models';
 import * as ruijieHelper from './lib/ruijie-helper';
 import wechatApi from './lib/wechat-api';
+import kdtApi from './lib/kdt-api';
 import crypto from './lib/crypto';
 import log from './lib/log';
 
@@ -32,6 +33,42 @@ app.use(bodyParser.json());
 app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'html');
 app.engine('html', ejs.renderFile);
+
+const valueToNumiid = {
+  50: '3032588',
+  30: '3032892',
+  20: '3032912',
+};
+
+const warningCout = 150;
+const delistingCount = 20;
+const checkSku = async (force) => {
+  const v50sku = await NetCard.count({ value: 50 }).exec();
+  const v30sku = await NetCard.count({ value: 30 }).exec();
+  const v20sku = await NetCard.count({ value: 20 }).exec();
+
+  if (v50sku < warningCout || v30sku < warningCout || v20sku < warningCout || force) {
+    await wechatApi.sendToAdmin('库存通知', `
+      面值 50 元网票
+      剩余 ${v50sku} 张
+      面值 30 元网票
+      剩余 ${v30sku} 张
+      面值 20 元网票
+      剩余 ${v20sku} 张
+    `);
+  }
+
+  const delisting = async (value, count) => {
+    if (count <= delistingCount) {
+      const numiid = valueToNumiid[value];
+      await kdtApi.delisting({ num_iid: numiid });
+    }
+  };
+
+  await delisting(50, v50sku);
+  await delisting(30, v30sku);
+  await delisting(20, v20sku);
+};
 
 app.get('/', async (req, res) => {
   res.end(STATUS_CODES[401]);

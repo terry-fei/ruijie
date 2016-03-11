@@ -72,6 +72,10 @@ uploader.on('uploadAccept', function(file, response) {
     return false;
   }
 
+  window.UPLOAD_NETCARDS = window.UPLOAD_NETCARDS || [];
+
+  window.UPLOAD_NETCARDS.push(response);
+
   console.log(response);
 });
 
@@ -102,7 +106,7 @@ $(function () {
     };
 
     var batches = [];
-    var uploadNetcards = window.UPLOAD_NETCARDS;
+    var uploadNetcards = window.UPLOAD_NETCARDS || [];
     uploadNetcards.forEach(function (batch) {
       statistics['20'] += batch['20'];
       statistics['30'] += batch['30'];
