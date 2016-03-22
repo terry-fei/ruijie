@@ -62,7 +62,7 @@ $(function () {
       if (data.hasFailed) {
         $.weui.alert('充值异常，请重试，如多次尝试仍失败，请申诉', function () {});
       } else {
-        $.weui.alert('<center>充值成功</center><br><center>金额：' + data.successValue + '元</center>', closeWindow);
+        $.weui.alert('<center>充值成功</center><br><center>金额：' + data.successValue + '元</center>', {title: ''}, closeWindow);
       }
     });
   });
