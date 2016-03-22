@@ -47,7 +47,7 @@ const checkSku = async (force) => {
   const v30sku = await NetCard.count({ value: 30, isUsed: false }).exec();
   const v20sku = await NetCard.count({ value: 20, isUsed: false }).exec();
 
-  if (v50sku < warningCout || v30sku < warningCout || v20sku < warningCout || force) {
+  if (v50sku === warningCout || v30sku === warningCout || v20sku === warningCout || force) {
     await wechatApi.sendToAdmin('库存通知', `
       面值 50 元网票
       剩余 ${v50sku} 张
@@ -59,7 +59,7 @@ const checkSku = async (force) => {
   }
 
   const delisting = async (value, count) => {
-    if (count <= delistingCount) {
+    if (count === delistingCount) {
       const numiid = valueToNumiid[value];
       await kdtApi.delisting({ num_iid: numiid });
     }
