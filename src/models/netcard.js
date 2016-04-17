@@ -47,7 +47,7 @@ NetCardSchema.statics.findAndMark = async function findAndMark({ orderID, value,
     const netcard = await this.findOneAndUpdate({
       value,
       orderID: '',
-    }, { orderID }, { new: true }).sort({ ka: 1 }).exec();
+    }, { orderID }, { new: true }).sort({ _id: 1, ka: 1 }).exec();
 
     decrypt(netcard);
     return netcard;
