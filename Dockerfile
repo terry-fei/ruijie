@@ -1,4 +1,4 @@
-FROM cloudcube/alinode
+FROM mhart/alpine-node:4
 MAINTAINER feit <i@feit.me>
 
 # use changes to package.json to force Docker not to use the cache
