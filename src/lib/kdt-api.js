@@ -55,4 +55,9 @@ kdtApi.delisting = (data) => {
   return wrapPromise(method, data);
 };
 
+kdtApi.getBillUrl = (data) => {
+  const method = 'kdt.trade.bill.geturl';
+  return wrapPromise(method, data);
+};
+
 export default kdtApi;
